@@ -1,7 +1,9 @@
 ### 01. Yarn, package.json
 
-### 02. JSX, es6, babel, webpack
+### 02. JSX, ES6+, Babel, Webpack
 
-### 03. React: props, state, component, lifecycle, thinking in React
+### 03. React
 
 ### 04. Redux
+
+### 05. Hooks
