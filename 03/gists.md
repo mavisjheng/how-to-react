@@ -13,7 +13,7 @@ import Nav from "react-bootstrap/Nav";
 function App() {
   return (
     <Navbar fixed="top" bg="dark" variant="dark">
-      <Navbar.Brand>RELEASE DRIVER</Navbar.Brand>
+      <Navbar.Brand>React Workshop Lab</Navbar.Brand>
       <Nav className="mr-auto">
         <Nav.Link href="#home">Home</Nav.Link>
         <Nav.Link href="#feeds">Feeds</Nav.Link>
@@ -25,26 +25,36 @@ function App() {
 export default App;
 ```
 
-ActionButtons.js
+OperationButtons.js
 
 ```javascript
 import React from "react";
 import Button from "react-bootstrap/Button";
 
-const ActionButtons = () => (
+const OperationButtons = () => (
   <>
-    <Button variant="outline-primary">Primary</Button>
-    <Button variant="outline-secondary">Secondary</Button>
-    <Button variant="outline-danger">Danger</Button>
+    <Button variant="outline-primary">Start</Button>
+    <Button variant="outline-secondary">Pause</Button>
+    <Button variant="outline-danger">Abort</Button>
   </>
 );
 
-export default ActionButtons;
+export default OperationButtons;
 ```
 
-[React Icons](https://react-icons.github.io/react-icons/)
+OperationButtons.css
 
-Radios.js
+```css
+.operation-buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 240px;
+  margin-top: 66px;
+  margin-left: 12px;
+}
+```
+
+SelectionRadios.js
 
 ```javascript
 import React from "react";
@@ -59,7 +69,7 @@ const radiosText = [
   "All",
 ];
 
-const Radios = () => (
+const SelectionRadios = () => (
   <Form>
     <div style={{ margin: "12px" }}>
       {radiosText.map((text) => (
@@ -68,14 +78,14 @@ const Radios = () => (
           label={text}
           value={text}
           type="radio"
-          key={`radio-show-${text}`}
+          key={`selection-radio-${text}`}
         />
       ))}
     </div>
   </Form>
 );
 
-export default Radios;
+export default SelectionRadios;
 ```
 
 RingTable.js
@@ -204,31 +214,16 @@ mock-api
 App.js
 
 ```javascript
-class App extends Component {
-  render() {
-    return (
-      <>
-        <Header theme="dark" brand="RELEASE DRIVER" links={["Home", "Feeds"]} />
-        <ActionButtons />
-        <Radios />
-        <RingTable />
-      </>
-    );
-  }
+state = {
+  allData: [],
+  displayedData: [],
+};
+
+componentDidMount() {
+  fetch("https://run.mocky.io/v3/adc0e655-b26f-4738-a0d8-9cc976a8fa36")
+    .then((response) => response.json())
+    .then((data) => this.setState({ allData: data, displayedData: data }));
 }
-```
-
-```javascript
- state = {
-    originalData: [],
-    rolloutData: [],
-  };
-
-  componentDidMount() {
-    fetch("https://run.mocky.io/v3/adc0e655-b26f-4738-a0d8-9cc976a8fa36")
-      .then((response) => response.json())
-      .then((data) => this.setState({ rolloutData: data, originalData: data }));
-  }
 ```
 
 RingTable.js
@@ -279,13 +274,4 @@ const RingTable = ({ rows }) => (
     </tbody>
   </Table>
 );
-```
-
-App.js
-
-```javascript
-state = {
-  action: "",
-  statusToShow: "All",
-};
 ```

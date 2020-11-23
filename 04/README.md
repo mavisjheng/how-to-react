@@ -2,7 +2,7 @@
 
 ### What is Redux?
 
-Redux is a state container for JavaScript applications. Normally with React, you manage state at a component level, and pass state around via props. **With Redux, the entire state of your application is managed in one immutable object**. Every update to the Redux state results in a copy of sections of the state, plus the new change.
+[Redux](https://redux.js.org/) is a state container for JavaScript applications. Normally with React, state is managed at a component level, and pass state around via props. **With Redux, the entire state of application is managed in one immutable object**. Every update to the Redux state results in a copy of sections of the state, plus the new change.
 
 ![redux-state](./images/redux-usage.png)
 
@@ -15,7 +15,7 @@ Note: A smaller application [may not need Redux](https://medium.com/@dan_abramov
 
 ### Redux Data Flow
 
-Redux architecture revolves around a **strict unidirectional data flow**. This means that all data in an application follows the same lifecycle pattern, making the logic of your app more predictable and easier to understand.
+Redux architecture revolves around a **strict unidirectional data flow**. This means that all data in an application follows the same lifecycle pattern, making the logic of application more predictable and easier to understand.
 
 ![redux-flow](./images/redux-flow.png)
 
@@ -25,7 +25,7 @@ Basically, Reducers pick up the information from Actions and "reduce" the inform
 View -> Action -> Reducer(s) -> Store -> View
 ```
 
-By using Redux, the state doesn't live in the View anymore, it is only connected to the View. What does connected mean? It is connected on two ends, because it is part of the **unidirectional data flow**. One end is responsible to **trigger an Action** to which updates the state eventually and the second end is responsible to **receive the state** from the Store. Therefore, the View can update accordingly to state changes but can also trigger state changes.
+By using Redux, the application state is connected to the View. It is connected on two ends, because it is part of the **unidirectional data flow**. One end is responsible to **trigger an Action** to which updates the state eventually and the second end is responsible to **receive the state** from the Store. Therefore, the View can update accordingly to state changes but can also trigger state changes.
 
 ### Redux terminology
 
@@ -33,10 +33,10 @@ By using Redux, the state doesn't live in the View anymore, it is only connected
 
 ### Actions
 
-An action sends data from your application to the Redux store. An action is conventionally an object with two properties: **type and optional payload**.
+An action sends data from application to the Redux store, it's conventionally an object with two properties: **type and payload**(optional).
 
 - The type is generally an uppercase string (assigned to a constant, referred to as **action type**) that describes the action.
-- The payload in a Redux action is not mandatory. It is additional data that may be passed, can be anything from a string to an object. You can define actions that have only an action type.
+- The payload is not mandatory, you can define actions that have only an action type. It is additional data that may be passed, can be anything from a string to an object.
 
 ```js
 // actio type
@@ -51,7 +51,7 @@ const ADD_TODO = 'ADD_TODO'
 
 {
   type: ADD_TODO,
-  todo: { id: '0', name: 'learn redux', completed: false },
+  todo: { id: 0, name: "learn redux", completed: false },
 }
 
 // action creator: a function that returns an action
@@ -61,7 +61,7 @@ const addTodo = (todo) => ({ type: ADD_TODO, todo })
 
 ### Dispatch
 
-**Executing an action is called dispatching in Redux**. You can dispatch an action to change the state in the Redux store. The dispatching of an action can be triggered in your View, it could be as simple as a click on a button.
+**Executing an action is called dispatching in Redux**. You can dispatch an action to change the state in the Redux store. The dispatching of an action can be triggered in View, it could be as simple as a click on a button.
 
 Dispatch is a method available on the store object that **accepts an object which is used to update the Redux state**. Usually, this object is the result of invoking an action creator.
 
@@ -73,7 +73,7 @@ dispatch({ type: DELETE_TODO, payload: id });
 
 ### Reducers
 
-Once an action is dispatched, it will go through **all** reducers in Redux. A reducer is a pure function that takes two parameters: **state and action**. It always produces the same output when the input stays the same. It has no side-effects, thus it is only an input/output operation.
+Once an action is dispatched, it will go through **all** reducers in Redux. A reducer is a pure function that takes two parameters: **state and action**.
 
 A reducer typically consists of **a switch statement that goes through all the possible action types, and always returns a copy of the entire state.** The reducer reduces - that explains the naming - **the previous state and incoming action to a new state**. It also embraces immutable data structures. It always returns a newState object without mutating the incoming prevState object.
 
@@ -113,12 +113,14 @@ function todoReducer(state = initialState, action) {
         ...state,
         todos: state.todos.filter((todo) => todo.id !== action.payload),
       };
+
     case ADD_TODO: {
       return {
         ...state,
         todos: state.todos.concat(action.todo),
       };
     }
+
     case TOGGLE_TODO: {
       return {
         ...state,
@@ -129,6 +131,7 @@ function todoReducer(state = initialState, action) {
         ),
       };
     }
+
     default:
       return state;
   }
@@ -158,18 +161,18 @@ store.getState();
 
 ### How to combine reducers
 
-As your app grows more complex, you'll want to split your reducing function into separate functions, **each managing independent parts of the state**.
+As application grows more complex, you'll want to split reducing function into separate functions, **each managing independent parts of the state**.
 
-Since the **Redux store takes only one reducer**, you have to combine both of your reducers to one reducer somehow. The `combineReducers` helper function turns an object whose values are different reducing functions into a single reducing function you can pass to `createStore`. The resulting reducer calls every child reducer, and **gathers their results into a single state object**.
+Since the **Redux store takes only one reducer**, you have to combine reducers to one reducer. The `combineReducers` function turns an object whose values are different reducing functions into a single reducing function that can be passed to `createStore`. The resulting reducer calls every child reducer, and **gathers their results into a single state object**.
 
-**The state produced by combineReducers() namespaces the states of each reducer under their keys as passed to combineReducers()**
+**The state produced by combineReducers() namespaces the states of each reducer under their keys as passed to combineReducers().**
 
 ```js
 import { combineReducers } from "redux";
 
 import languagesReducer from "./languages";
 import sessionReducer from "./session";
-import uiReducer from "./reducer";
+import uiReducer from "./ui";
 import gatewayReducer from "./gateway";
 
 const rootReducer = combineReducers({
@@ -200,7 +203,7 @@ export default rootReducer;
 
 ### Provider
 
-When used with React, a `<Provider>` exists to wrap the application, which makes the Redux store available to the rest of your app.
+When used with React, a `<Provider>` exists to wrap the application, which makes the Redux store available to the rest of application.
 
 ```js
 import React from "react";
@@ -219,23 +222,21 @@ ReactDOM.render(
 
 ### Connect
 
-React-Redux provides a `connect` function for you to connect React component to Redux store.
+[React-Redux](https://react-redux.js.org/) provides a **connect** function to connect React component to Redux store. It does not modify the component class passed to it; instead, it returns a new, connected component class that wraps the component passed in.
 
 ```js
 function connect(mapStateToProps?, mapDispatchToProps?, mergeProps?, options?)(ReactComponent)
 ```
 
-It provides its connected component with the pieces of the data it needs from the store, and the functions it can use to dispatch actions to the store. It does not modify the component class passed to it; instead, it returns a new, connected component class that wraps the component you passed in.
+**mapStateToProps** provides its connected component with state data it needs from the store, and **mapDispatchToProps** provides the functions it can use to dispatch actions to the store. State and dispatch will be supplied to mapStateToProps or mapDispatchToProps functions as the first argument.
 
-The `mapStateToProps` and `mapDispatchToProps` deals with your Redux store’s state and dispatch, respectively. state and dispatch will be supplied to your mapStateToProps or mapDispatchToProps functions as the first argument.
-
-**mapStateToProps** is used to map a part of the global state as props from the Redux store to the React component. It is a function that can be passed to the `connect` HOC. If it is passed, the input component of the connect HOC will subscribe to updates from the Redux store. Thus, it means that every time the store subscription notices an update, the `mapStateToProps()` function will run.
+**mapStateToProps** is used to map a part of the global state as props from the Redux store to the React component. It is a function that can be passed to the `connect()`. If it is passed, the input component of the `connect()` will subscribe to updates from the Redux store. Thus, it means that every time the store subscription notices an update, the mapStateToProps function will run.
 
 ```js
 const mapStateToProps = (state) => ({ todos: state.todos });
 ```
 
-**mapDispatchToProps** is used to pass dispatchable Redux actions as functions to your React component via props. It is a function (or object) that can be passed to the `connect` HOC. Whereas `mapStateToProps()` gives access to the global state, `mapDispatchToProps()` gives access to the dispatch method of the Redux store. **It makes it possible to dispatch actions but passes down only plain functions that wire up the dispatching in a higher-order function**. After all, it makes it possible to pass functions down to the input component of the connect HOC to alter the state.
+**mapDispatchToProps** is used to pass dispatchable Redux actions as functions to React component via props. It is a function (or object) that can be passed to the `connect()`. Whereas `mapStateToProps()` gives access to the global state, `mapDispatchToProps()` gives access to the dispatch method of the Redux store to alter the state. It makes it possible to dispatch actions but passes down only plain functions that wire up the dispatching in a higher-order function.
 
 ```js
 const mapDispatchToProps = (dispatch) => {
@@ -252,7 +253,10 @@ const mapDispatchToProps = (dispatch) => {
 import React from "react";
 import { connect } from "react-redux";
 
-// Redux state is now in the props of the component
+// action creator
+const doListPosts = () => ({ type: "LIST_POSTS" });
+
+// Redux state and action are now in the props of the component
 const PostsPage = ({ loading, posts, hasErrors, listPosts }) => {
   return (
     <section>
@@ -264,8 +268,6 @@ const PostsPage = ({ loading, posts, hasErrors, listPosts }) => {
 ```
 
 ```js
-const doListPosts = () => ({ type: "LIST_POSTS" });
-
 // Map Redux state to React component props
 const mapStateToProps = (state) => ({
   loading: state.posts.loading,
@@ -273,7 +275,7 @@ const mapStateToProps = (state) => ({
   hasErrors: state.posts.hasErrors,
 });
 
-// Map Redux action to React component props, can dispatch action creatore or plain action object
+// Map Redux action to React component props, can dispatch action creator or plain action object
 const mapDispatchToProps = (dispatch) => ({
   listPosts: () => dispatch(doListPosts()),
   dispatchPlainObject: () => dispatch({ type: "MY_ACTION" }),

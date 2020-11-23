@@ -2,22 +2,22 @@
 
 ![react-hooks](./images/react-hooks.png)
 
-React [Hooks](https://reactjs.org/docs/hooks-intro.html) were introduced in React 16.8. Hooks are functions that let you “hook into” React state and lifecycle features from function components.
+React [Hooks](https://reactjs.org/docs/hooks-intro.html) were introduced in React 16.8. Hooks are functions that let you “hook into” React state and lifecycle methods from function components.
 
 Hooks don’t work inside classes — they let you use React without classes. Whereas function components have been called stateless components before, they are finally able to use state with React Hooks.
 
 - **Completely opt-in.** You can try Hooks in a few components without rewriting any existing code.
 - **100% backwards-compatible.** Hooks don’t contain any breaking changes.
-- **There are no plans to remove classes from React**, React will keep supporting class components for the foreseeable future.
-- **Hooks don’t replace your knowledge of React concepts.** Instead, Hooks provide a more direct API to the React concepts you already know: props, state, context, refs, and lifecycle.
+- **There are no plans to remove classes from React**. React will keep supporting class components for the foreseeable future.
+- **Hooks don’t replace your knowledge of React concepts**, instead, Hooks provide a more direct API to the React concepts you already know: props, state, context, refs, and lifecycle.
 
 ## Why Hooks?
 
-#### Unnecessary Component Refactorings
+### Unnecessary Component Refactorings
 
-Previously, only class components were used for local state management and lifecycle methods. This came with the drawback of refactoring components from function components to class components every time state or lifecycle methods were needed (and vice versa). With Hooks there is no need for this refactoring. Side-effects and state are finally available in function components. Thus, there is no need to use class components anymore.
+Previously, only class components were used for local state management and lifecycle methods. This came with the drawback of refactoring components from function components to class components every time state or lifecycle methods were needed (and vice versa). With Hooks there is no need for this refactoring. Side-effects and state are finally available in function components. Thus, **there is no need to use class components anymore**.
 
-#### Complex components become hard to understand
+### Complex components become hard to understand
 
 In class components, side-effects were mostly introduced in lifecycle methods (e.g. componentDidMount, componentDidUpdate, componentWillUnmount). A side-effect could be fetching data or interacting with the Browser API. Usually these side-effects came with a setup and clean up phase. Now, if you would introduce more than one of these side-effects in a React class component's lifecycle methods, **all side-effects would be grouped by lifecycle method but not by side-effect.**
 
@@ -26,10 +26,10 @@ In class components, side-effects were mostly introduced in lifecycle methods (e
 Hooks let you split one component into smaller functions based on what pieces are related (such as setting up a subscription or fetching data), rather than forcing a split based on lifecycle methods.
 
 ```js
-import React from 'react';
+import React, { Component } from 'react';
 
 // side-effects in a class component
-class MyComponent extends React.Component {
+class MyComponent extends Component {
   // setup phase
   componentDidMount() {
     // add listener for feature 1
@@ -46,14 +46,16 @@ class MyComponent extends React.Component {
 ```
 
 ```js
+import React, { useEffect } from 'react';
+
 // side-effects in function component with Hooks
 function MyComponent() {
-  React.useEffect(() => {
+  useEffect(() => {
     // add listener for feature 1 (setup)
     // return function to remove listener for feature 1 (clean up)
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     // add listener for feature 2 (setup)
     // return function to remove listener for feature 2 (clean up)
   });
@@ -61,25 +63,18 @@ function MyComponent() {
 }
 ```
 
-#### It’s hard to reuse stateful logic between components
+### It’s hard to reuse stateful logic between components
 
 With Hooks, you can extract stateful logic from a component so it can be tested independently and reused. Hooks allow you to reuse stateful logic without changing your component hierarchy. This makes it easy to share Hooks among many components.
 
 ## State Hook: useState
 
-If you write a function component and realize you need to add some state to it, previously you had to convert it to a class. Now you can use a Hook inside the existing function component.
-
-**useState is a new way to use the exact same capabilities that this.state provides in a class.**
+If you write a function component and realize you need to add some state to it, previously you had to convert it to a class. Now you can use a Hook inside the existing function component. **[useState](https://reactjs.org/docs/hooks-state.html) is a new way to use the exact same capabilities that this.state provides in a class.**
 
 ```js
 // Equivalent Class Example
 class Example extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      count: 0,
-    };
-  }
+  state = { count: 0 };
 
   render() {
     return (
@@ -116,9 +111,11 @@ The useState hook gives you everything you need to manage state in a function co
 
 ```js
 // array destructuring
-var fruitStateVariable = useState("banana"); // Returns a pair
-var fruit = fruitStateVariable[0]; // First item in a pair
-var setFruit = fruitStateVariable[1]; // Second item in a pair
+const fruitStateVariable = useState("banana"); // Returns a pair
+const fruit = fruitStateVariable[0]; // First item in a pair
+const setFruit = fruitStateVariable[1]; // Second item in a pair
+
+const [fruit, setFruit] = useState("banana");
 ```
 
 ```js
@@ -133,24 +130,20 @@ function ExampleWithManyStates() {
 
 ## Effect Hook: useEffect
 
-You’ve likely performed data fetching, subscriptions, or manually changing the DOM from React components before. We call these operations “side effects” (or “effects” for short) because they can affect other components and can’t be done during rendering.
+You’ve likely performed data fetching, subscriptions, or manually changing the DOM from React components before, we call these operations **side effects** (or **effects** for short) because they can affect other components and can’t be done during rendering.
 
-The Effect Hook, useEffect, adds the ability to perform side effects from a function component. **It serves the same purpose as componentDidMount, componentDidUpdate, and componentWillUnmount in React classes, but unified into a single API.**
+The Effect Hook, **[useEffect](https://reactjs.org/docs/hooks-effect.html)**, adds the ability to perform side effects from function component. **It serves the same purpose as componentDidMount, componentDidUpdate, and componentWillUnmount in React classes, but unified into a single API.**
 
 ```js
 // Equivalent Class Example
 // Note how we have to duplicate the code between these two lifecycle methods in class
 class Example extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      count: 0,
-    };
-  }
+  state = { count: 0 };
 
   componentDidMount() {
     document.title = `You clicked ${this.state.count} times`;
   }
+
   componentDidUpdate() {
     document.title = `You clicked ${this.state.count} times`;
   }
@@ -191,18 +184,14 @@ function Example() {
 
 When you call useEffect, you tell React that your component needs to do something after render. Effects are declared inside the component so they have access to its props and state. **By default, React runs the effects after every update — including the first render. Instead of thinking in terms of “mounting” and “updating”, you might find it easier to think that effects happen “after render”.** React guarantees the DOM has been updated by the time it runs the effects.
 
-#### Effects with Cleanup
+### Effects with Cleanup
 
 In a React class, you would typically set up a subscription in componentDidMount, and clean it up in componentWillUnmount. **Notice how componentDidMount and componentWillUnmount need to mirror each other. Lifecycle methods force us to split this logic even though conceptually code in both of them is related to the same effect.**
 
 ```js
 // Equivalent Class Example
 class FriendStatus extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { isOnline: null };
-    this.handleStatusChange = this.handleStatusChange.bind(this);
-  }
+  state = { isOnline: null };
 
   componentDidMount() {
     ChatAPI.subscribeToFriendStatus(
@@ -218,11 +207,11 @@ class FriendStatus extends React.Component {
     );
   }
 
-  handleStatusChange(status) {
+  handleStatusChange = (status) => {
     this.setState({
       isOnline: status.isOnline,
     });
-  }
+  };
 
   render() {
     if (this.state.isOnline === null) {
@@ -261,7 +250,7 @@ function FriendStatus(props) {
 }
 ```
 
-#### Optimizing Performance by Skipping Effects
+### Optimizing Performance by Skipping Effects
 
 In some cases, cleaning up or applying the effect after every render might create a performance problem. In class components, we can solve this by writing an extra comparison with prevProps or prevState inside componentDidUpdate.
 
@@ -282,8 +271,6 @@ useEffect(() => {
 }, [count]); // Only re-run the effect if count changes
 ```
 
-**If you want to run an effect and clean it up only once (on mount and unmount), you can pass an empty array ([]) as a second argument.** This tells React that your effect doesn’t depend on any values from props or state, so it never needs to re-run.
-
 This also works for effects that have a cleanup phase.
 
 ```js
@@ -299,11 +286,31 @@ useEffect(() => {
 }, [props.friend.id]); // Only re-subscribe if props.friend.id changes
 ```
 
+**If you want to run an effect and clean it up only once (on mount and unmount), you can pass an empty array ([]) as a second argument.** This tells React that your effect **doesn’t depend on any values** from props or state, so it never needs to re-run.
+
+```js
+import React, { useState, useEffect } from "react";
+
+function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    fetch("https://run.mocky.io/users")
+      .then((response) => response.json())
+      .then((data) => {
+        setUser(data.users[0]);
+      });
+  }, []); // Pass empty array to only run once on mount
+
+  return <div>{user ? user.name : "Loading..."}</div>;
+}
+```
+
 ## Rules of Hooks
 
 - Only call Hooks **from React function components**. Don’t call Hooks from regular JavaScript functions.
 
-- **Only Call Hooks at the Top Level. Don’t call Hooks inside loops, conditions, or nested functions**. React relies on the order in which Hooks are called. By following this rule, you ensure that Hooks are called in the same order each time a component renders. That’s what allows React to correctly preserve the state of Hooks between multiple useState and useEffect calls.
+- **Only Call Hooks at the Top Level. Don’t call Hooks inside loops, conditions, or nested functions**. React relies on the order in which Hooks are called. By following this rule, you ensure that Hooks are called in the same order each time a component renders. That’s what allows React to correctly associate the state of Hooks between multiple useState and useEffect calls.
 
 ```js
 function Form() {
@@ -328,34 +335,34 @@ function Form() {
 
 ```js
 // First render
-useState("Mary");         // 1. Initialize the name state variable with 'Mary'
-useEffect(persistForm);   // 2. Add an effect for persisting the form
-useState("Poppins");      // 3. Initialize the surname state variable with 'Poppins'
-useEffect(updateTitle);   // 4. Add an effect for updating the title
+useState("Mary"); // 1. Initialize the name state variable with 'Mary'
+useEffect(persistForm); // 2. Add an effect for persisting the form
+useState("Poppins"); // 3. Initialize the surname state variable with 'Poppins'
+useEffect(updateTitle); // 4. Add an effect for updating the title
 
 // Second render
-useState("Mary");         // 1. Read the name state variable (argument is ignored)
-useEffect(persistForm);   // 2. Replace the effect for persisting the form
-useState("Poppins");      // 3. Read the surname state variable (argument is ignored)
-useEffect(updateTitle);   // 4. Replace the effect for updating the title
+useState("Mary"); // 1. Read the name state variable (argument is ignored)
+useEffect(persistForm); // 2. Replace the effect for persisting the form
+useState("Poppins"); // 3. Read the surname state variable (argument is ignored)
+useEffect(updateTitle); // 4. Replace the effect for updating the title
 ```
 
 ```js
-// 🔴 We're breaking the first rule by using a Hook in a condition
+// 🔴 We're breaking the rule by using a Hook in a condition
 if (name !== "") {
   useEffect(function persistForm() {
     localStorage.setItem("formData", name);
   });
 }
 
-useState("Mary");          // 1. Read the name state variable (argument is ignored)
+useState("Mary"); // 1. Read the name state variable (argument is ignored)
 // useEffect(persistForm)  // 🔴 This Hook was skipped!
-useState("Poppins");       // 🔴 2 (but was 3). Fail to read the surname state variable
-useEffect(updateTitle);    // 🔴 3 (but was 4). Fail to replace the effect
+useState("Poppins"); // 🔴 2 (but was 3). Fail to read the surname state variable
+useEffect(updateTitle); // 🔴 3 (but was 4). Fail to replace the effect
 
 // If we want to run an effect conditionally, we can put that condition inside Hook
 useEffect(function persistForm() {
-  // 👍 We're not breaking the first rule anymore
+  // 👍 We're not breaking the rule anymore
   if (name !== "") {
     localStorage.setItem("formData", name);
   }
@@ -415,7 +422,7 @@ function FriendListItem(props) {
 }
 ```
 
-A custom Hook is a JavaScript function whose name starts with **use** and that may call other Hooks.
+**A custom Hook is a JavaScript function whose name starts with _use_ and that may call other Hooks.**
 
 ```js
 import { useState, useEffect } from "react";
@@ -438,8 +445,9 @@ function useFriendStatus(friendID) {
 }
 ```
 
+Reuse stateful logic between components.
+
 ```js
-// reuse stateful logic between components
 function FriendStatus(props) {
   const isOnline = useFriendStatus(props.friend.id);
 
@@ -456,4 +464,52 @@ function FriendListItem(props) {
     <li style={{ color: isOnline ? "green" : "black" }}>{props.friend.name}</li>
   );
 }
+```
+
+## React Redux Hooks
+
+React Redux now offers a set of [hook APIs](https://react-redux.js.org/api/hooks) as an alternative to the existing `connect()` Higher Order Component. These APIs allow you to subscribe to the Redux store and dispatch actions, without having to wrap your components in `connect()`. These hooks were first added in v7.1.0.
+
+### useSelector()
+
+```js
+const result = useSelector(selector);
+```
+
+Allows you to extract data from the Redux store state, using a selector function. The selector is approximately equivalent to the `mapStateToProps` argument to `connect` conceptually. The selector will be called with the entire Redux store state as its only argument.
+
+```js
+import React from "react";
+import { useSelector } from "react-redux";
+
+export const CounterComponent = () => {
+  const counter = useSelector((state) => state.counter);
+  return <div>{counter}</div>;
+};
+```
+
+### useDispatch()
+
+```js
+const dispatch = useDispatch();
+```
+
+This hook returns a reference to the **dispatch** function from the Redux store. You may use it to dispatch actions as needed.
+
+```js
+import React from "react";
+import { useDispatch } from "react-redux";
+
+export const CounterComponent = ({ value }) => {
+  const dispatch = useDispatch();
+
+  return (
+    <div>
+      <span>{value}</span>
+      <button onClick={() => dispatch({ type: "increment-counter" })}>
+        Increment counter
+      </button>
+    </div>
+  );
+};
 ```

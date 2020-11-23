@@ -2,18 +2,20 @@ App.js
 
 ```js
 import { createStore } from "redux";
-import { selectAction, SELECT_ACTION } from "./redux/actions/rolloutOperation";
-import rolloutOperationReducer from "./redux/reducers/rolloutOperation";
+import rolloutOperationReducer, {
+  executeOperation,
+  EXECUTE_OPERATION,
+} from "./redux/modules/rolloutOperation";
 
 const store = createStore(rolloutOperationReducer);
 console.log(store.getState());
 
 let unsubscribe = store.subscribe(() => console.log(store.getState()));
-store.dispatch(selectAction("start"));
-store.dispatch(selectAction("pause"));
+store.dispatch(executeOperation("start"));
+store.dispatch(executeOperation("pause"));
 store.dispatch({
-  type: SELECT_ACTION,
-  action: "abort",
+  type: EXECUTE_OPERATION,
+  operation: "abort",
 });
 
 unsubscribe();
@@ -30,7 +32,7 @@ import store from "./redux/store";
 </Provider>;
 ```
 
-store.js
+redux/store.js
 
 ```js
 const store = createStore(
@@ -39,12 +41,12 @@ const store = createStore(
 );
 ```
 
-store.js
+redux/store.js
 
 ```js
 import { createStore, combineReducers } from "redux";
-import rolloutOperationReducer from "./reducers/rolloutOperation";
-import statusSelectionReducer from "./reducers/statusSelection";
+import rolloutOperationReducer from "./modules/rolloutOperation";
+import statusSelectionReducer from "./modules/statusSelection";
 
 const rootReducer = combineReducers({
   rolloutOperation: rolloutOperationReducer,
@@ -52,36 +54,11 @@ const rootReducer = combineReducers({
 });
 ```
 
-StatusSelection.js
-
-```js
-import { connect } from "react-redux";
-import { selectStatus } from "../../redux/actions/statusSelection";
-
-const mapDispatchToProps = (dispatch) => ({
-  onStatusSelected: (status) => dispatch(selectStatus(status)),
-});
-
-export default connect(null, mapDispatchToProps)(StatusSelection);
-```
-
-actions/rings
+redux/modules/rings
 
 ```js
 // action type
 export const SET_RINGS = "SET_RINGS";
-
-// action creator
-export const setRings = (data) => ({
-  type: SET_RINGS,
-  rings: data,
-});
-```
-
-reducers/rings
-
-```js
-import { SET_RINGS } from "../actions/rings";
 
 const initialState = {
   rings: [],
@@ -99,9 +76,15 @@ export default function ringsReducer(state = initialState, action = {}) {
       return state;
   }
 }
+
+// action creator
+export const setRings = (data) => ({
+  type: SET_RINGS,
+  rings: data,
+});
 ```
 
-RingTable.js
+containers/RingTable/RingTable.js
 
 ```js
 class RingTable extends Component {
@@ -143,65 +126,57 @@ class RingTable extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({
-  rings: state.rings.rings,
-  selectedStatus: state.statusSelection.status,
-  rolloutAction: state.rolloutOperation.action,
-});
-
 const mapDispatchToProps = (dispatch) => ({
   setRings: (data) => dispatch(setRings(data)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(RingTable);
+export default connect(null, mapDispatchToProps)(RingTable);
 ```
 
-RingTable.js
+containers/RingTable/RingTable.js
 
 ```js
-state = { tableRows: [], allData: [] };
+state = { allData: [], displayedData: [], };
 
 componentDidUpdate(prevProps, prevState) {
-  const { rolloutAction: prevAction, selectedStatus: prevStatus } = prevProps;
-  const { rolloutAction, selectedStatus } = this.props;
-  const { allData } = this.state;
-
-  if (prevAction !== rolloutAction) {
-    let modifiedData = allData;
-
-    if (rolloutAction === "start") {
-      modifiedData = modifiedData.map((item) => ({
-        ...item,
-        status: item.status === "Paused" ? "Ongoing" : item.status,
-      }));
-    } else if (rolloutAction === "pause") {
-      modifiedData = modifiedData.map((item) => ({
-        ...item,
-        status: item.status === "Ongoing" ? "Paused" : item.status,
-      }));
-    } else if (rolloutAction === "abort") {
-      modifiedData = modifiedData.map((item) => ({
-        ...item,
-        status:
-          item.status === "Ongoing" || item.status === "Paused"
-            ? "Aborted"
-            : item.status,
-      }));
-    }
-    this.setState({ allData: modifiedData });
+  if (prevProps.rings !== this.props.rings) {
+    this.setState({
+      allData: this.props.rings,
+      displayedData: this.props.rings,
+    });
   }
 
-  if (prevStatus !== selectedStatus || prevState.allData !== allData) {
-    const selectedData =
-      selectedStatus === "All"
-        ? allData
-        : allData.filter((data) => data.status === selectedStatus);
+  if (
+    prevProps.statusToShow !== this.props.statusToShow ||
+    prevState.allData !== this.state.allData
+  ) {
+    const filteredData =
+      this.props.statusToShow === "All"
+        ? this.state.allData
+        : this.state.allData.filter(
+            (data) => data.status === this.props.statusToShow
+          );
+    this.setState({ displayedData: filteredData });
+  }
 
-    this.setState({ tableRows: selectedData });
+  if (prevProps.rolloutOperation !== this.props.rolloutOperation) {
+    const changedData = this.state.allData.map((data) => ({
+      ...data,
+      status:
+        data.status === "Paused" || data.status === "Ongoing"
+          ? operationTransition[this.props.rolloutOperation]
+          : data.status,
+    }));
+
+    this.setState({ allData: changedData });
   }
 }
 ```
 
-References:
-
-- https://github.com/mavisjheng/create-react-app/commits/master
+```js
+const operationTransition = {
+  start: "Ongoing",
+  pause: "Paused",
+  abort: "Aborted",
+};
+```

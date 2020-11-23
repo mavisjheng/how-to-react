@@ -23,25 +23,8 @@ ReactDOM.render(<App />, document.getElementById("root"));
   </head>
   <body>
     <div id="root"></div>
-    <!-- <script src="./dist/bundle.js"></script> -->
   </body>
 </html>
-
-```
-
-webpack.config.js
-
-```javascript
-// entry and output
-const path = require("path");
-
-module.exports = {
-  entry: "./src/index.js",
-  output: {
-    path: path.resolve(__dirname, "dist"),
-    filename: "bundle.js",
-  },
-};
 ```
 
 .babelrc
@@ -55,10 +38,17 @@ module.exports = {
 webpack.config.js
 
 ```javascript
-// loader and plugins
+const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
- module: {
+module.exports = {
+  entry: "./src/index.js",
+  output: {
+    path: path.resolve(__dirname, "dist"),
+    filename: "bundle.js",
+  },
+  mode: process.env.NODE_ENV,
+  module: {
     rules: [
       {
         test: /\.js$/,
@@ -70,15 +60,16 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
     ],
   },
   plugins: [new HtmlWebpackPlugin({ template: "./src/index.html" })],
+};
 ```
 
 package.json
 
 ```javascript
 "scripts": {
-    "start": "webpack-dev-server",
-    "build": "webpack"
-  },
+  "start": "webpack serve --mode development",
+  "build": "webpack"
+},
 ```
 
 webpack.config.js
@@ -86,7 +77,7 @@ webpack.config.js
 ```javascript
 // webpack-dev-server setting
 devServer: {
-    hot: true,
-    open: true,
-  },
+  hot: true,
+  open: true,
+},
 ```

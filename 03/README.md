@@ -1,13 +1,17 @@
 ## Props and State
 
-**[Props](https://www.w3schools.com/REACT/react_props.asp)** is short for properties and they are used to pass data between React components. Props are passed to components via HTML attributes and they're **read-only, component cannot change the props**.
-
-The important part of props is that data with **props are being passed in a uni-directional flow, one way from parent to child**.
+**[Props](https://www.w3schools.com/REACT/react_props.asp)** is short for properties and they are used to pass data between React components. Props are passed to components via **HTML attributes** and they're **read-only**, component cannot change the props. The important part of props is that data with props are being passed in **a uni-directional flow, one way from parent to child**.
 
 ```javascript
+import React from "react";
+
 class Car extends React.Component {
   render() {
-    return <h2>I am {this.props.brand}!</h2>;
+    return (
+      <h2>
+        There are {this.props.number} {this.props.brand} in garage
+      </h2>
+    );
   }
 }
 
@@ -15,37 +19,39 @@ class Garage extends React.Component {
   render() {
     return (
       <div>
-        <h1>Who lives in my garage?</h1>
-        <Car brand="Ford" />
+        <h1>What is in my garage?</h1>
+        <Car number={2} brand="Ford" />
       </div>
     );
   }
 }
 ```
 
-React has another special built-in object called **[state](https://www.w3schools.com/REACT/react_state.asp)**, which allows components to create and manage their own data. So unlike props, components cannot pass data with state, but they can create and manage it **internally**.
-
-State should not be modified directly, but it can be modified with a special method called **setState()**. The state of one component will often become the props of a child component.
+React has another special built-in object called **[state](https://www.w3schools.com/REACT/react_state.asp)**, which allows components to create and manage their own data. So unlike props, components cannot pass data with state, but they can create and manage it **internally**. State can't be modified directly, but it can be modified with a special method called `setState()`. State updates are merged, when you call `setState()`, React merges the object you provide into the current state. The state of one component will often become the props of a child component.
 
 ```javascript
-class App extends React.Component {
+import React, { Component } from "react";
+import Car from "./Car";
+
+class App extends Component {
   constructor() {
     super();
     this.state = {
-      age: 3,
+      number: 3,
       name: "Mary",
     };
   }
 
   increase = () => {
-    this.setState({ age: this.state.age + 1 });
+    this.setState({ number: this.state.number + 1 });
   };
 
   render() {
     return (
       <div>
-        <p>{`${this.state.name} is ${this.state.age} years old`}</p>
-        <button onClick={this.increase}>Plus 1</button>
+        <p>{`${this.state.name} has ${this.state.number} cars`}</p>
+        <button onClick={this.increase}>+1</button>
+        <Car number={this.state.number} brand="Ford" />
       </div>
     );
   }
@@ -62,26 +68,28 @@ this.setState({
 });
 ```
 
-**State** is the local state of the component which cannot be accessed and modified outside of the component. It's similar to variables within a function.
-
-**Props** get passed to the component, **make components reusable** by giving components the ability to receive data from their parent component in the form of props. They are similar to function parameters.
+**State** is the local state of the component which cannot be accessed and modified outside of the component, it's similar to variables within a function. **Props** get passed to the component, **make components reusable** by giving components the ability to receive data from their parent component in the form of props, they are similar to function parameters.
 
 Props and State are both plain JavaScript objects. **An update can be caused by changes to props or state.**
 
 ## Component
 
-**[Components](https://reactjs.org/docs/components-and-props.html)** let you split the UI into independent, reusable pieces, and think about each piece in isolation. Conceptually, components are like JavaScript functions. They accept arbitrary inputs (called **props**) and return React elements describing what should appear on the screen.
+**[Components](https://reactjs.org/docs/components-and-props.html)** let you split the UI into independent, reusable pieces, and think about each piece in isolation. Conceptually, components are like JavaScript functions, they accept arbitrary inputs (called **props**) and return React elements describing what should appear on the screen.
 
-**Always start component names with a capital letter.** React treats components starting with lowercase letters as DOM tags. For example, `<div />` represents an HTML div tag, but `<Welcome />` represents a component and requires Welcome to be in scope.
+**User-Defined components must be capitalized.** React treats components starting with lowercase letters as built-in DOM tags. For example, `<div />` represents an HTML div tag, but `<Welcome />` correspond to a component defined or imported in scope.
 
 ```javascript
-// React elements that represent DOM tags
+// elements that represent DOM tags
 const element = <div />;
+
+React.createElement("div");
 ```
 
 ```javascript
-// user-defined components, must start with a capital letter
+// user-defined components must start with a capital letter
 const element = <Welcome name="Sara" />;
+
+React.createElement(Welcome, { name: "Sara" });
 ```
 
 ```javascript
@@ -108,14 +116,14 @@ const Avatar = () => {
 };
 ```
 
-In order to make component reusable, we have to extract it to its own component.
-
-Extracting components might seem like grunt work at first, but having a palette of reusable components pays off in larger apps. A good rule of thumb is that if a part of your UI is **used several times** (Button, Panel, Avatar), or is **complex enough on its own** (App, FeedStory, Comment), it is a good candidate to be extracted to a separate component.
+In order to make component reusable, we have to extract it to its own component. Extracting components might seem like grunt work at first, but having a palette of reusable components pays off in larger apps. A good rule of thumb is that if a part of your UI is **used several times** (Button, Panel, Avatar), or is **complex enough on its own** (App, FeedStory, Comment), it is a good candidate to be extracted to a separate component.
 
 Make a component more reusable by turning it **from specific to more generic**. Naming props **from the component’s own point of view rather than the context in which it is being used**.
 
 ```javascript
 // before extracting components, all the nesting and hard to reuse individual parts of it
+// <Comment author={{ avatarUrl: "https://gravatar.com/avatar/a563115169439b178e10c14b15548961?s=400&d=monsterid&r=x", name: "Jackie" }} text="nice product" />
+
 function Comment(props) {
   return (
     <div className="Comment">
@@ -128,14 +136,13 @@ function Comment(props) {
         <div className="UserInfo-name">{props.author.name}</div>
       </div>
       <div className="Comment-text">{props.text}</div>
-      <div className="Comment-date">{formatDate(props.date)}</div>
     </div>
   );
 }
 ```
 
 ```javascript
-// extracting components: Avatar
+// extracting component: Avatar
 // The Avatar doesn’t need to know that it is being rendered inside another component
 // This is why we have given its prop a more generic name: user rather than author
 function Avatar(props) {
@@ -146,7 +153,7 @@ function Avatar(props) {
 ```
 
 ```javascript
-// extracting components: UserInfo
+// extracting component: UserInfo
 function UserInfo(props) {
   return (
     <div className="UserInfo">
@@ -164,7 +171,6 @@ function Comment(props) {
     <div className="Comment">
       <UserInfo user={props.author} />
       <div className="Comment-text">{props.text}</div>
-      <div className="Comment-date">{formatDate(props.date)}</div>
     </div>
   );
 }
@@ -173,20 +179,20 @@ function Comment(props) {
 ☞☞☞☞ [How To Make A React Component Reusable?
 ](https://www.robinwieruch.de/react-reusable-components)
 
-## Function component and Class component
+## Functional component and Class component
 
-### Function Component
+### Functional Component
 
-- [Function components](https://www.robinwieruch.de/react-function-component) are literally JavaScript functions, they are a simpler way to write components that **only contain a render method and don’t have their own state**. They are typically arrow functions but can also be created with the regular function keyword.
+- [Functional components](https://www.robinwieruch.de/react-function-component) are literally JavaScript functions, they are a simpler way to write components that **only contain a render method and don’t have their own state**. They are typically arrow functions but can also be created with the regular function keyword.
 
-- Props are the function component's parameters. Whereas the component can stay generic, we decide from the outside what it should render or how it should behave. Also called Dumb Components, Presentational Components or Stateless Components as **they simply accept data and display them in some form, their only responsibility is to present something to the DOM**.
+- Props are the functional component's parameter, we decide from the outside what it should render or how it should behave, so they're also called Dumb Component, Presentational Component or Stateless Component as **they simply accept data and display them in some form, their only responsibility is to present something to the DOM**.
 
-- Since props are always coming as object, and most often you need to extract the information from the props anyway, JavaScript [object destructuring](https://pjchender.blogspot.com/2017/01/es6-object-destructuring.html) comes in handy
+- Since props are always coming as object, and most often you need to extract the information from the props anyway, JavaScript [object destructuring](https://pjchender.blogspot.com/2017/01/es6-object-destructuring.html) comes in handy.
 
 ```javascript
-// Function Component / Arrow Function Component
+// Functional Component / Arrow Function Component
 function Headline() {
-  const greeting = "Hello Function Component!";
+  const greeting = "Hello Functional Component!";
   return <h1>{greeting}</h1>;
 }
 
@@ -203,11 +209,9 @@ const Welcome = (props) => <h1>Hello, {props.name}</h1>;
 
 ### Class Component
 
-- To define a React component class, you need to **extend React.Component**. The only method you must define in a class component is `render()`, and the return can only return one parent element.
+- To define a React class component, you need to **extend React.Component**. The only method you must define in a class component is `render()`, and the return can only return one parent element.
 
-- Also called Smart Components or Stateful Components as they tend to implement logic and they can maintain its own state.
-
-- Class Components are more complex than function components including **constructors, lifecycle methods, render() function and state management**.
+- They're also called Smart Component or Stateful Component as they tend to implement logic and they can maintain their own state. They're more complex than functional component including **constructors, lifecycle methods, render() function and state management**.
 
 ```javascript
 // Class Component
@@ -218,56 +222,46 @@ class Welcome extends Component {
     return <h1>Hello, {this.props.name}</h1>;
   }
 }
-
-// Class Component
-import React from "react";
-
-class Welcome extends React.Component {
-  render() {
-    return <h1>Hello, {this.props.name}</h1>;
-  }
-}
 ```
 
 ## Lifecycle
 
-Each component has several [lifecycle methods](https://reactjs.org/docs/react-component.html#the-component-lifecycle) that you can override to run code at particular times in the process.
+Each React class component has several [lifecycle methods](https://reactjs.org/docs/react-component.html#the-component-lifecycle) that you can override to run code at particular times in the process.
 
-Commonly used lifecycle methods:
+Commonly used lifecycle methods are:
 
-- Mounting – Birth of component, when an instance of a component is being created and inserted into the DOM
+- **Mounting** – Birth of component, these methods are called in the following order when an instance of a component is being created and inserted into the DOM:
 
   - constructor()
   - render()
   - componentDidMount()
 
-- Updating – Growth of component, re-rendered, an update can be caused by changes to props or state
+- **Updating** – Growth of component, re-rendered, an update can be caused by changes to props or state. These methods are called in the following order when a component is being re-rendered:
 
   - render()
   - componentDidUpdate()
 
-- Unmounting – Death of component, when a component is being removed from the DOM
+- **Unmounting** – Death of component, this method is called when a component is being removed from the DOM:
   - componentWillUnmount()
 
 ![Lifecycle](./images/lifecycle.png)
 
 ### Mounting: constructor ➝ render ➝ componentDidMount
 
-### constructor
+### constructor(props)
 
-The first thing that gets called inside class components is constructor, **it does not apply to function components**. The constructor in a React component is called **before the component is mounted**.
+The [constructor](https://reactjs.org/docs/react-component.html#constructor) for a React component is called **before it is mounted**. Typically, it's only used for two purposes: initialize local state by assigning an object to this.state and [bind event handler method](https://reactjs.org/docs/handling-events.html) to an instance. So if you don’t do either of them, you don’t need to implement a constructor.
 
-The main purpose for writing constructor is to initialize state in a class, create [refs](https://reactjs.org/docs/refs-and-the-dom.html) and [bind event handlers](https://reactjs.org/docs/handling-events.html) to the component instance using .bind().
+Constructor is the only place where you should assign this.state directly. In all other methods, you need to use this.setState() instead. **Don't call setState() in the constructor().**
 
 ```javascript
 // with Constructor
-// super refers to the parent class constructor (In our example, it points to the React.Component implementation)
+// super refers to the parent class constructor (In this example, it points to the React.Component implementation)
 // importantly, you can’t use this in a constructor until after you’ve called the parent constructor
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = { color: "red", count: 0 };
-    this.inputRef = React.createRef();
     this.handleOnPress = this.handleOnPress.bind(this);
   }
 
@@ -282,7 +276,6 @@ class App extends React.Component {
           I have {this.state.count} {this.state.color} Car
         </h2>
         <button onClick={this.handleOnPress}>Click</button>
-        <input ref={this.inputRef} />
       </div>
     );
   }
@@ -296,7 +289,6 @@ Note that using a constructor is optional if your Babel setup has support for [c
 // using class properties: babel-plugin-transform-class-properties
 class App extends React.Component {
   state = { color: "red", count: 0 };
-  inputRef = React.createRef();
 
   handleOnPress = () => {
     this.setState({ count: this.state.count + 1 });
@@ -309,67 +301,48 @@ class App extends React.Component {
           I have {this.state.count} {this.state.color} Car
         </h2>
         <button onClick={this.handleOnPress}>Click</button>
-        <input ref={this.inputRef} />
       </div>
     );
   }
 }
 ```
 
-### render
+### render()
 
-As the name suggests it handles the component rendering to the UI. It happens during the mounting and updating of component.
+As the name suggests it handles the component rendering to the UI. It happens during the mounting and updating of component. The [render()](https://reactjs.org/docs/react-component.html#render) function should be pure with no side-effects and will always return the same output when the same inputs are passed, this means that **you can not setState() within a render()**.
 
-The render() function should be pure with no side-effects and will always return the same output when the same inputs are passed, this means that you can not setState() within a render().
+The only method you must define in a React class component is render(). All the other lifecycle methods are optional.
 
-When called, it should examine this.props and this.state and return one of the following types:
+```javascript
+// A common pattern in React is for a component to return multiple elements.
+// Fragments let you group a list of children without adding extra nodes to the DOM.
+render() {
+  return (
+    <React.Fragment>
+      <ChildA />
+      <ChildB />
+      <ChildC />
+    </React.Fragment>
+  );
+}
+```
 
-- **React elements.** Typically created via JSX. For example, `<div />` and `<MyComponent />` are React elements that instruct React to render a DOM node, or another user-defined component.
-
-- **Arrays and fragments.** Let you return multiple elements from render.
-
-  ```javascript
-  // A common pattern in React is for a component to return multiple elements.
-  // Fragments let you group a list of children without adding extra nodes to the DOM.
-  render() {
-    return (
-      <React.Fragment>
-        <ChildA />
-        <ChildB />
-        <ChildC />
-      </React.Fragment>
-    );
-  }
-  ```
-
-  ```javascript
-  // There is a new, shorter syntax you can use for declaring fragments. It looks like empty tags
-  render() {
-    return (
-      <>
-        <ChildA />
-        <ChildB />
-        <ChildC />
-      </>
-    );
-  }
-  ```
-
-- [**Portals.**](https://reactjs.org/docs/portals.html) Let you render children into a different DOM subtree. Portals provide a first-class way to render children into a DOM node that exists outside the DOM hierarchy of the parent component.
-
-  ```javascript
-  // The first argument (child) is any renderable React child, such as an element, string, or fragment.
-  // The second argument (container) is a DOM element.
-  ReactDOM.createPortal(child, container);
-  ```
-
-- **String and numbers.** These are rendered as text nodes in the DOM.
-
-- **Booleans or null.** Render nothing. (Mostly exists to support `return test && <Child />` pattern, where test is boolean.)
+```javascript
+// There is a new, shorter syntax you can use for declaring fragments. It looks like empty tags
+render() {
+  return (
+    <>
+      <ChildA />
+      <ChildB />
+      <ChildC />
+    </>
+  );
+}
+```
 
 ### componentDidMount()
 
-Now your component has been mounted and ready, that’s when the next React lifecycle method componentDidMount() comes in play. componentDidMount() is invoked immediately after a component is mounted (inserted into the tree). **If you need to load data from a remote endpoint, this is a good place to instantiate the network request**.
+Now your component has been mounted and ready, that’s when the next lifecycle method [componentDidMount()](https://reactjs.org/docs/react-component.html#componentdidmount) comes in play. componentDidMount() is invoked immediately after a component is mounted (inserted into the DOM tree). **If you need to load data from a remote endpoint, this is a good place to instantiate the network request**.
 
 Most common use case for componentDidMount: starting API calls to load in data for your component or all the setup you can't do without a DOM.
 
@@ -411,15 +384,11 @@ export default App;
 
 ### Updating: render ➝ componentDidUpdate
 
-### componentDidUpdate()
+### componentDidUpdate(prevProps, prevState)
 
-```javascript
-componentDidUpdate(prevProps, prevState, snapshot);
-```
+This lifecycle method is invoked as soon as the updating happens. The most common use case for the [componentDidUpdate()](https://reactjs.org/docs/react-component.html#componentDidUpdate) method is **updating the DOM in response to prop or state changes**. This is also a good place to do network requests as long as you compare the current props/state to previous props/state.
 
-This lifecycle method is invoked as soon as the updating happens. The most common use case for the componentDidUpdate() method is **updating the DOM in response to prop or state changes**. This is also a good place to do network requests as long as you compare the current props to previous props.
-
-You can call setState() in this lifecycle but note that **it must be wrapped in a condition to check for state or prop changes from previous state or you’ll cause an infinite loop**.
+**You can call setState() in this lifecycle but note that it must be wrapped in a condition to check for state or prop changes from previous state or you’ll cause an infinite loop**.
 
 ```javascript
 // check if there has been a change in props from what it currently is
@@ -436,7 +405,7 @@ componentDidUpdate(prevProps) {
 
 ### componentWillUnmount()
 
-componentWillUnmount() is invoked immediately before a component is unmounted and destroyed. **Perform any necessary cleanup in this method**, such as invalidating timers, canceling network requests, or cleaning up any subscriptions that were created in componentDidMount().
+[componentWillUnmount()](https://reactjs.org/docs/react-component.html#componentWillUnmount) is invoked immediately before a component is unmounted and destroyed. **Perform any necessary cleanup in this method**, such as invalidating timers, canceling network requests, or cleaning up any subscriptions that were created in componentDidMount().
 
 ```javascript
 componentWillUnmount() {

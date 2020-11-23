@@ -1,8 +1,6 @@
 [Thinking in React
 ](https://reactjs.org/docs/thinking-in-react.html)
 
-Start With A Mock
-
 ![Mock](./images/mock-design-1.png)
 
 ```
@@ -32,7 +30,7 @@ UI and data models tend to adhere to the same information architecture. If built
 
 https://codepen.io/gaearon/pen/BwWzwm
 
-To build a static version of your app that renders your data model, you’ll want to build components that **reuse other components and pass data using props**. props are a way of passing data from parent to child. If you’re familiar with the concept of state, **don’t use state at all to build this static version. State is reserved only for interactivity, that is, data that changes over time**. Since this is a static version of the app, you don’t need it.
+To build a static version of your app that renders your data model, you’ll want to build components that **reuse other components and pass data using props**, props are a way of passing data from parent to child. If you’re familiar with the concept of state, **don’t use state at all to build this static version. State is reserved only for interactivity, that is, data that changes over time**. Since this is a static version of the app, you don’t need it.
 
 At the end of this step, you’ll have reusable components that only have render() methods since this is a static version of your app. You also can see React’s **one-way data flow.**
 
@@ -64,7 +62,7 @@ Remember: React is all about **one-way data flow down the component hierarchy**.
 For each piece of state in your application:
 
 - Identify every component that renders something based on that state.
-- Find a common owner component (a single component **above all the components that need the state in the hierarchy**).
+- **Find a common owner component (a single component above all the components that need the state in the hierarchy).**
 - Either the common owner or another component higher up in the hierarchy should own the state.
 - If you can’t find a component where it makes sense to own the state, create a new component solely for holding the state and add it somewhere in the hierarchy above the common owner component.
 
@@ -78,4 +76,4 @@ So far, we’ve built an app that renders correctly as a function of props and s
 
 We’ve set the value prop of the input to always be equal to the state passed in from FilterableProductTable so you’ll see that React ignores your input.
 
-**We want to make sure that whenever the user changes the form, we update the state to reflect the user input. Since components should only update their own state, FilterableProductTable will pass callbacks to SearchBar that will fire whenever the state should be updated.** We can use the onChange event on the inputs to be notified of it. The callbacks passed by FilterableProductTable will call setState(), and the app will be updated.
+We want to make sure that whenever the user changes the form, we update the state to reflect the user input. Since components should only update their own state, FilterableProductTable will pass callbacks to SearchBar that will fire whenever the state should be updated. We can use the onChange event on the inputs to be notified of it. The callbacks passed by FilterableProductTable will call setState(), and the app will be updated.
